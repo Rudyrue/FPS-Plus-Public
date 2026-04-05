@@ -1717,14 +1717,19 @@ class PlayState extends MusicBeatState
 			}
 		}
 		else{
-			if(previousReportedSongTime != FlxG.sound.music.time){
-				Conductor.songPosition = FlxG.sound.music.time;
+			var delta:Float = elapsed * 1000;
+			var rawTime:Float = FlxG.sound.music.time;
+			if (rawTime == previousReportedSongTime) {
+				Conductor.songPosition += delta;
+			} else {
+				if (Math.abs(rawTime - Conductor.songPosition) >= delta)
+					Conductor.songPosition = rawTime;
+				else
+					Conductor.songPosition += delta;
+
 				//Failsafe to make sure that the onComplete actually runs because sometimes it would just not run sometimes when I was doing stuff with the song playback speed.
 				if(Utils.inRange(previousReportedSongTime, FlxG.sound.music.length, 1000) && !Utils.inRange(Conductor.songPosition, FlxG.sound.music.length, 1000) && !songEnded){ FlxG.sound.music.onComplete(); }
 				previousReportedSongTime = FlxG.sound.music.time;
-			}
-			else{
-				Conductor.songPosition += FlxG.elapsed * 1000 * songPlaybackSpeed;
 			}
 		}
 
